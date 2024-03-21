@@ -26,13 +26,13 @@ There are three methods of interest:
 
 Example code:
 ```js
-var abi = require('ethereumjs-abi')
+var abi = require('@bifproject/ethereumjs-abi')
 
 // returns the encoded binary (as a Buffer) data to be sent
-var encoded = abi.rawEncode([ "address" ], [ "0x0000000000000000000000000000000000000000" ])
+var encoded = abi.rawEncode([ "address" ], [ 'bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p' ])
 
 // returns the decoded array of arguments
-var decoded = abi.rawDecode([ "address" ], data)
+var decoded = abi.stringify([ 'address' ], abi.rawDecode([ "address" ], data))
 ```
 
 #### Encoding and decoding aided by the JSON ABI definition
@@ -40,7 +40,7 @@ var decoded = abi.rawDecode([ "address" ], data)
 Planned for the future is supporting the JSON ABI definition:
 
 ```js
-var abi = require('ethereumjs-abi')
+var abi = require('@bifproject/ethereumjs-abi')
 
 // need to have the ABI definition in JSON as per specification
 var tokenAbi = [{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"}]
@@ -53,10 +53,10 @@ var decoded = abi.decode(tokenAbi, "balanceOf(uint256 address)", data)
 #### Simple encoding and decoding
 
 ```js
-var abi = require('ethereumjs-abi')
+var abi = require('@bifproject/ethereumjs-abi')
 
 // returns the encoded binary (as a Buffer) data to be sent
-var encoded = abi.simpleEncode("balanceOf(address):(uint256)", "0x0000000000000000000000000000000000000000")
+var encoded = abi.simpleEncode("balanceOf(address):(uint256)", "bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p")
 
 // returns the decoded array of arguments
 var decoded = abi.simpleDecode("balanceOf(address):(uint256)", data)
@@ -64,14 +64,14 @@ var decoded = abi.simpleDecode("balanceOf(address):(uint256)", data)
 
 #### Solidity *tightly packed* formats
 
-This library also supports creating Solidity's tightly packed data constructs, which are used together with ```sha3```, ```sha256``` and ```ripemd160``` to create hashes.
+This library also supports creating Solidity's tightly packed data constructs, which are used together with ```sha3```, ```sha256``` to create hashes.
 
 Solidity code:
 ```js
 contract HashTest {
   function testSha3() returns (bytes32) {
-   address addr1 = 0x43989fb883ba8111221e89123897538475893837;
-   address addr2 = 0;
+   address addr1 = did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p;
+   address addr2 = 0x000000000000000000000000000000000000000;
    uint val = 10000;
    uint timestamp = 1448075779;
 
@@ -82,21 +82,18 @@ contract HashTest {
 
 Creating the same hash using this library:
 ```js
-var abi = require('ethereumjs-abi')
+var abi = require('@bifproject/ethereumjs-abi')
 var BN = require('bn.js')
 
 abi.soliditySHA3(
     [ "address", "address", "uint", "uint" ],
-    [ new BN("43989fb883ba8111221e89123897538475893837", 16), 0, 10000, 1448075779 ]
+    [ 'did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr', '0', 10000, 1448075779 ]
 ).toString('hex')
 ```
 
 For the same data structure:
-* sha3 will return ```0xc3ab5ca31a013757f26a88561f0ff5057a97dfcc33f43d6b479abc3ac2d1d595```
-* sha256 will return ```0x344d8cb0711672efbdfe991f35943847c1058e1ecf515ff63ad936b91fd16231```
-* ripemd160 will return ```0x000000000000000000000000a398cc72490f72048efa52c4e92067e8499672e7``` (NOTE: it is 160bits, left padded to 256bits)
-
-Note that ```ripemd160()``` in Solidity returns bytes20 and if you cast it to bytes32, it will be right padded with zeroes.
+* sha3 will return ```c94ac1aa7c404ee9ff2308c1c3804b120e3285e595e2a51891a0d102231510f6```
+* sha256 will return ```f073ec116d3ac396103258803f193cdd5ed29f384924593e62c091cd1d643f44```
 
 #### Using Serpent types
 
