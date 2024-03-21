@@ -1,12 +1,12 @@
 {
-  "name": "ethereumjs-abi",
-  "version": "0.6.8",
-  "description": "Decoder and encoder for the Ethereum ABI",
+  "name": "@bifproject/ethereumjs-abi",
+  "version": "1.0.0",
+  "description": "Decoder and encoder for the bif EVM ABI",
   "main": "index.js",
   "dependencies": {
     "bn.js": "^4.11.8",
     "ethereumjs-util": "^6.0.0",
-    "bs58": "5.0.0"
+    "@bifproject/bs58": "5.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.3",
@@ -29,18 +29,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/axic/ethereumjs-abi.git"
+    "url": "git+https://github.com/caict-4iot-dev/ethereumjs-abi.git"
   },
   "keywords": [
-    "ethereum",
+    "bif",
     "ABI"
   ],
-  "author": "Alex Beregszaszi <alex@rtfs.hu>",
+  "author": "maxufeng <maxufeng@caict.ac.cn>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/axic/ethereumjs-abi/issues"
+    "url": "https://github.com/caict-4iot-dev/ethereumjs-abi/issues"
   },
-  "homepage": "https://github.com/axic/ethereumjs-abi",
+  "homepage": "https://github.com/caict-4iot-dev/ethereumjs-abi",
   "standard": {
     "globals": [
       "describe",

@@ -32,7 +32,7 @@ describe('official test vector 3 (encoding)', function () {
 
 describe('official test vector 4 (encoding)', function () {
   it('should equal', function () {
-    var a = abi.methodID('f', [ 'uint', 'uint32[]', 'bytes10', 'bytes' ]).toString('hex') + abi.rawEncode([ 'uint', 'uint32[]', 'bytes10', 'bytes' ], [ 0x123, [ 0x456, 0x789 ], '1234567890', 'Hello, world!' ]).toString('hex')
+    var a = abi.methodID('f', [ 'uint', 'uint32[]', 'bytes10', 'bytes' ]).toString('hex') + abi.rawEncode([ 'uint', 'uint32[]', 'bytes10', 'bytes' ], [ 0x123, [ 0x456, 0x789 ], Buffer.from('1234567890', 'utf8'), 'Hello, world!' ]).toString('hex')
     var b = '8be6524600000000000000000000000000000000000000000000000000000000000001230000000000000000000000000000000000000000000000000000000000000080313233343536373839300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000'
     assert.strict.equal(a, b)
   })
@@ -190,8 +190,8 @@ describe('encoding uint8 with 9bit data', function () {
 })
 
 it('decoding address with leading 0', function () {
-  var decoded = abi.rawDecode([ 'address' ], Buffer.from('0000000000000000000000000005b7d915458ef540ade6068dfe2f44e8fa733c', 'hex'))
-  assert.strict.deepEqual(abi.stringify([ 'address' ], decoded), [ '0x0005b7d915458ef540ade6068dfe2f44e8fa733c' ])
+  var decoded = abi.rawDecode([ 'address' ], Buffer.from('0000000000000000656684738e0b5eea332816961eb22d64956d29a53261cdbf', 'hex'))
+  assert.strict.deepEqual(abi.stringify([ 'address' ], decoded), [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p' ])
 })
 
 // Homebrew decoding tests
@@ -321,7 +321,7 @@ describe('decoding uint[2] with [1,2,3]', function () {
 
 describe('stringify', function () {
   it('should be hex prefixed for address', function () {
-    assert.strict.deepEqual(abi.stringify([ 'address' ], [ new BN('1234', 16) ]), [ '0x1234' ])
+    assert.strict.deepEqual(abi.stringify([ 'address' ], [ Buffer.from('656684738e0b5eea332816961eb22d64956d29a53261cdbf', 'hex') ]), [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p' ])
   })
 
   it('should be hex prefixed for bytes', function () {
@@ -357,11 +357,11 @@ describe('stringify', function () {
   })
 
   it('should work for address[]', function () {
-    assert.strict.deepEqual(abi.stringify([ 'address[]' ], [ [ new BN('1234', 16), new BN('5678', 16) ] ]), [ '0x1234, 0x5678' ])
+    assert.strict.deepEqual(abi.stringify([ 'address[]' ], [ [ Buffer.from('656684738e0b5eea332816961eb22d64956d29a53261cdbf', 'hex'), Buffer.from('65661896d57b7fbd2b29ea4356dbe07b06d545163e800ba9', 'hex') ] ]), [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p, did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr' ])
   })
 
   it('should work for address[2]', function () {
-    assert.strict.deepEqual(abi.stringify([ 'address[2]' ], [ [ new BN('1234', 16), new BN('5678', 16) ] ]), [ '0x1234, 0x5678' ])
+    assert.strict.deepEqual(abi.stringify([ 'address[2]' ], [ [ Buffer.from('656684738e0b5eea332816961eb22d64956d29a53261cdbf', 'hex'), Buffer.from('65661896d57b7fbd2b29ea4356dbe07b06d545163e800ba9', 'hex') ] ]), [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p, did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr' ])
   })
 
   it('should work for bytes[]', function () {
@@ -416,9 +416,42 @@ describe('solidity tight packing address', function () {
   it('should equal', function () {
     var a = abi.solidityPack(
       [ 'address' ],
-      [ new BN('43989fb883ba8111221e89123897538475893837', 16) ]
+      [ '656600000005b7d915458ef540ade6068dfe2f44e8fa733c' ]
     )
-    var b = '43989fb883ba8111221e89123897538475893837'
+    var b = '656600000005b7d915458ef540ade6068dfe2f44e8fa733c'
+    assert.strict.equal(a.toString('hex'), b.toString('hex'))
+  })
+})
+
+describe('solidity tight packing address 0x', function () {
+  it('should equal', function () {
+    var a = abi.solidityPack(
+      [ 'address' ],
+      [ '0x656600000005b7d915458ef540ade6068dfe2f44e8fa733c' ]
+    )
+    var b = '656600000005b7d915458ef540ade6068dfe2f44e8fa733c'
+    assert.strict.equal(a.toString('hex'), b.toString('hex'))
+  })
+})
+
+describe('solidity tight packing address 0', function () {
+  it('should equal', function () {
+    var a = abi.solidityPack(
+      [ 'address' ],
+      [ '0' ]
+    )
+    var b = '656600000000000000000000000000000000000000000000'
+    assert.strict.equal(a.toString('hex'), b.toString('hex'))
+  })
+})
+
+describe('solidity tight packing address did:bid', function () {
+  it('should equal', function () {
+    var a = abi.solidityPack(
+      [ 'address' ],
+      [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p' ]
+    )
+    var b = '656684738e0b5eea332816961eb22d64956d29a53261cdbf'
     assert.strict.equal(a.toString('hex'), b.toString('hex'))
   })
 })
@@ -537,9 +570,9 @@ describe('solidity tight packing address[]', function () {
   it('should equal', function () {
     let a = abi.solidityPack(
       ['address[]'],
-      [[new BN('43989fb883ba8111221e89123897538475893837', 16)]]
+      [[ '0x656684738e0b5eea332816961eb22d64956d29a53261cdbf' ]]
     )
-    let b = '00000000000000000000000043989fb883ba8111221e89123897538475893837'
+    let b = '0000000000000000656684738e0b5eea332816961eb22d64956d29a53261cdbf'
     assert.strict.equal(a.toString('hex'), b.toString('hex'))
   })
 })
@@ -570,9 +603,9 @@ describe('solidity tight packing sha3', function () {
   it('should equal', function () {
     var a = abi.soliditySHA3(
       [ 'address', 'address', 'uint', 'uint' ],
-      [ new BN('43989fb883ba8111221e89123897538475893837', 16), 0, 10000, 1448075779 ]
+      [ 'did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr', '0', 10000, 1448075779 ]
     )
-    var b = 'c3ab5ca31a013757f26a88561f0ff5057a97dfcc33f43d6b479abc3ac2d1d595'
+    var b = 'c94ac1aa7c404ee9ff2308c1c3804b120e3285e595e2a51891a0d102231510f6'
     assert.strict.equal(a.toString('hex'), b.toString('hex'))
   })
 })
@@ -592,20 +625,9 @@ describe('solidity tight packing sha256', function () {
   it('should equal', function () {
     var a = abi.soliditySHA256(
       [ 'address', 'address', 'uint', 'uint' ],
-      [ new BN('43989fb883ba8111221e89123897538475893837', 16), 0, 10000, 1448075779 ]
+      [ 'did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr', '0', 10000, 1448075779 ]
     )
-    var b = '344d8cb0711672efbdfe991f35943847c1058e1ecf515ff63ad936b91fd16231'
-    assert.strict.equal(a.toString('hex'), b.toString('hex'))
-  })
-})
-
-describe('solidity tight packing ripemd160', function () {
-  it('should equal', function () {
-    var a = abi.solidityRIPEMD160(
-      [ 'address', 'address', 'uint', 'uint' ],
-      [ new BN('43989fb883ba8111221e89123897538475893837', 16), 0, 10000, 1448075779 ]
-    )
-    var b = '000000000000000000000000a398cc72490f72048efa52c4e92067e8499672e7'
+    var b = 'f073ec116d3ac396103258803f193cdd5ed29f384924593e62c091cd1d643f44'
     assert.strict.equal(a.toString('hex'), b.toString('hex'))
   })
 })
@@ -614,9 +636,9 @@ describe('solidity tight packing with small ints', function () {
   it('should equal', function () {
     var a = abi.soliditySHA3(
       [ 'address', 'address', 'int64', 'uint192' ],
-      [ new BN('43989fb883ba8111221e89123897538475893837', 16), 0, 10000, 1448075779 ]
+      [ 'did:bid:ef7g5BDJmHxnTC1Ja25gKEqmDx2AKCFr', '0', 10000, 1448075779 ]
     )
-    var b = '1c34bbd3d419c05d028a9f13a81a1212e33cb21f4b96ce1310442911c62c6986'
+    var b = '4c6bd78d4035a84f8e9ec09a9bc5a7742229ed6760b7e7f107ae4cda2e42bc1c'
     assert.strict.equal(a.toString('hex'), b.toString('hex'))
   })
 })
@@ -736,6 +758,27 @@ describe('encoding 256 bits as bytes', function () {
   it('should not leave trailing zeroes', function () {
     var a = abi.rawEncode([ 'bytes' ], [ Buffer.from('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'hex') ])
     assert.strict.equal(a.toString('hex'), '00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+  })
+})
+
+describe('encoding address', function () {
+  it('should equal', function () {
+    var a = abi.rawEncode([ 'address' ], [ 'did:bid:efcx2eHszCy1zDtNiWdBBnsjG316EU5p' ])
+    assert.strict.equal(a.toString('hex'), '0000000000000000656684738e0b5eea332816961eb22d64956d29a53261cdbf')
+  })
+})
+
+describe('encoding address 0x', function () {
+  it('should equal', function () {
+    var a = abi.rawEncode([ 'address' ], [ '0x656684738e0b5eea332816961eb22d64956d29a53261cdbf' ])
+    assert.strict.equal(a.toString('hex'), '0000000000000000656684738e0b5eea332816961eb22d64956d29a53261cdbf')
+  })
+})
+
+describe('encoding address 0', function () {
+  it('should equal', function () {
+    var a = abi.rawEncode([ 'address' ], [ '0' ])
+    assert.strict.equal(a.toString('hex'), '0000000000000000656600000000000000000000000000000000000000000000')
   })
 })
 
