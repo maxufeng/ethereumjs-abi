@@ -1,6 +1,6 @@
 {
   "name": "@bifproject/ethereumjs-abi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Decoder and encoder for the bif EVM ABI",
   "main": "index.js",
   "dependencies": {
